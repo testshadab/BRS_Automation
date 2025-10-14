@@ -8,6 +8,7 @@ import {RentalsPage} from '../../pages/rentals.page.js'
 /** @type {RentalsPage} */
 let rentalPage;
 let newCategoriesName
+let uniqueName
 
 When('I navigate to Rental Categories', async function () {
 rentalPage=new RentalsPage(this.page)
@@ -95,11 +96,44 @@ Then('I delete the newly created promo code {string}',async function (promotitle
 // Rental Items steps:
 
 When('I navigate to Rental Items', async function () {
+rentalPage=new RentalsPage(this.page)
+await rentalPage.navigateToRentalPage()
+});
+
+When('I add a new Product with required details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}', async function (optionText, Dimentions, Qty, Outlet, ShortDescription, LongtDescription, Producttype, Billingtype) {
+  // Write code here that turns the phrase above into concrete actions
+  rentalPage=new RentalsPage(this.page)
+  uniqueName=await rentalPage.createNewItem(optionText, Dimentions, Qty, Outlet, ShortDescription, LongtDescription, Producttype, Billingtype)
+  })
+
+When('I navigate to the website and confirm that the newly created item appears on the home page',async function () {
   // Write code here that turns the phrase above into concrete actions
 
-  
+  orderPage = new OrdersPage(this.page);
+  mainPage = this.page; 
+  this.page = await orderPage.clickOnTheWebsiteLink();
+  await orderPage.dismissPopup()
+  rentalPage=new RentalsPage(this.page)
+  await rentalPage.verifyProductAddedOnWebsiteProductPage(uniqueName)
+})
+
+When('Edit the newly created item and verify that the changes are saved successfully', async function () {
+  // Write code here that turns the phrase above into concrete actions
+
+  await this.page.close();
+  this.page = mainPage;
+  await this.page.bringToFront();
+  console.log('Returned to main website page');
+  await this.page.waitForTimeout(3000)
+  rentalPage=new RentalsPage(this.page)
 
 })
+
+Then('Delete the newly created item and confirm that it no longer appears on the home page', async function () {
+  // Write code here that turns the phrase above into concrete actions
+})
+
+
 
 
 

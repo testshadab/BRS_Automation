@@ -18,12 +18,18 @@ Feature: Test the functionality of Rental Categories
     And I navigate to the website and confirm that the newly created category appears on the home page
     And Edit the newly created category and verify that the changes are saved successfully.
     Then Delete the newly created category and confirm that it no longer appears on the home page.
-  
-  
-  # @rentalItems
-  # Scenario: Perform CRUD operations on Rental Category
-  #   When I navigate to Rental Items
 
+  @items
+  Scenario Outline: Create a new Rental Item
+    When I navigate to Rental Items
+    And I add a new Product with required details "<optionText>", "<Dimentions>", "<Qty>", "<Outlet>", "<ShortDescription>", "<LongtDescription>", "<Producttype>", "<Billingtype>"
+    And I navigate to the website and confirm that the newly created item appears on the home page
+    And Edit the newly created item and verify that the changes are saved successfully
+    Then Delete the newly created item and confirm that it no longer appears on the home page
+
+    Examples:
+      | optionText        | Dimentions | Qty | Outlet | ShortDescription       | LongtDescription              | Producttype | Billingtype | update_Qty |
+      | Wet Bounce Houses |   20X20X30 |   5 |      1 | Test Short Description | This is Test Long Description | Child       | Daily       |          8 |
 
   @priceOption
   Scenario Outline: Perform CRUD operations on price options

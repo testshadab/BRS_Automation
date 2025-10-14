@@ -48,19 +48,25 @@ export class RentalsPage {
        this.discountEditSuccessMessage= page.locator("//*[contains(text(),'Discount was successfully updated')]")
        this.discountDeleteSuccessMessage= page.locator("//*[contains(text(),'Discount was successfully deleted')]")
 
-       // =========== Rental Items ================
-       this.rentalItemsLink= page.locator("//a[normalize-space(.)='Rental items']")
-       this.addNewProductButton= page.locator("//a[normalize-space(.)='Add Product']")
-       this.existingCategoryRadioButton= page.locator("/span[text()='Existing Category']/preceding-sibling::input")
-       this.categoryDropDown= page.locator("#product_product_category_id")
-       this.productNameInputField= page.locator('[id="product_name"]')
-       this.productSizeInputField= page.locator('[id="product_size"]')
-       this.stockInputField= page.locator('#product_units_in_stock')
-       this.outletsInputField= page.locator('#product_outlets')
-       this.shortDescriptionInputField= page.locator('[aria-label="Editor, product_short_description"]')
-       this.longDescriptionInputField= page.locator('[aria-label="Editor, product_description"]')
-       this.productTypeDropDown= page.locator("#product_product_type")
-       this.billingTypeDropDown= page.locator('#product_billing_type')
+      // ======RENTALS PAGE LOCATORS======
+        this.RentalItemsButton = page.locator("//a[normalize-space(.)='Rental items']");
+        this.AddProductButton = page.locator("//a[normalize-space(.)='Add Product']");
+        // ======= CREATE RENTAL ITEM =============
+        this.ExistingCatagoryRadioButton = page.locator("//span[text()='Existing Category']/preceding-sibling::input");
+        this.CatagoryDropdown = page.locator("#product_product_category_id");
+        this.ItemNameInputfield = page.locator('[id="product_name"]');
+        this.ItemSizeInputfield = page.locator("#product_size");
+        this.ItemUnitQtyInputfield = page.locator("#product_units_in_stock");
+        this.ItemOutletQtyInputfield = page.locator("#product_outlets");
+        this.ItemShortDesInputfield = page.locator('[aria-label="Editor, product_short_description"]');
+        this.ItemLongDesInputfield = page.locator('[aria-label="Editor, product_description"]');
+        this.ProductTypeDropdown = page.locator('#product_product_type');
+        this.BillingTypeDropdown = page.locator('#product_billing_type');
+        this.DisplayonHomepageCheckbox = page.locator('#product_is_featured');
+        this.CreateProductButton = page.locator('[value="Create Product"]');
+        this.ItemCreationSuccessMessage = page.locator("//*[contains(text(),'Product was successfully created')]");
+        this.productLink = page.locator("//a[text()='Products']");
+        this.wetBounceHouseCategories = page.locator('[alt="Wet Bounce Houses"]');
        
 
     }
@@ -374,4 +380,108 @@ async deleteNewlyCreatedPromo(promoname)
   await this.discountDeleteSuccessMessage.waitFor({ state: 'visible', timeout: 10000 })
 }
 
+// *=====RENTAL ITEM METHODS=======*
+     // ===== UTIL: Unique name generator (DDMMYYYYHHMMSS) =====
+    generateUniqueItemName(prefix = 'TestItem') {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0'); // 0-based
+        const yyyy = now.getFullYear();
+        const HH = String(now.getHours()).padStart(2, '0');
+        const MM = String(now.getMinutes()).padStart(2, '0');
+        const SS = String(now.getSeconds()).padStart(2, '0');
+        return `${prefix}${dd}${mm}${yyyy}${HH}${MM}${SS}`;
+    }
+    // Navigate To rental page-
+    async navigateToRentalPage()
+    {
+        await this.page.waitForTimeout(2000)
+        await this.RentalsDropdown.click();
+        await this.page.waitForTimeout(2000)
+        await this.RentalItemsButton.click();
+        await this.page.waitForTimeout(2000)
+    }
+     async createNewItem(optionText, Dimentions, Qty, Outlet, ShortDescription, LongtDescription, Producttype, Billingtype)
+     {
+        await this.page.waitForTimeout(2000)
+        await this.AddProductButton.click();
+        await this.page.waitForTimeout(2000)
+        await this.ExistingCatagoryRadioButton.click()
+        await this.CatagoryDropdown.waitFor({ state: 'visible', timeout: 10000 });
+        await this.page.selectOption('#product_product_category_id', { label: optionText });
+       const uniqueName = this.generateUniqueItemName();
+        await this.ItemNameInputfield.fill(uniqueName);
+        await this.ItemSizeInputfield.fill(Dimentions);
+        await this.ItemUnitQtyInputfield.fill(Qty);
+        await this.ItemOutletQtyInputfield.fill(Outlet);
+        await this.page.waitForTimeout(2000)
+        await this.DisplayonHomepageCheckbox.click();
+        await this.page.waitForTimeout(2000)
+        await this.CreateProductButton.click();
+        await this.ItemCreationSuccessMessage.waitFor({ state: 'visible', timeout: 10000})
+        
+        return uniqueName;
+    }
+
+    async verifyProductAddedOnWebsiteProductPage(uniqueName)
+    {
+      await this.productLink.click();
+      await this.page.waitForTimeout(2000)
+      await this.wetBounceHouseCategories.click()
+      await this.page.waitForTimeout(5000)
+          // Verify that the category no longer appears on the home page
+const isVisible = await this.page.locator(`text=${uniqueName}`).first().isVisible();
+
+if (!isVisible) {
+  console.log(`"${uniqueName}" is no longer visible on the product page`);
+} else {
+  console.log(`"${uniqueName}" is still present on the product page`);
+}
+
+  }
+
+  async editTheNewlyCreatedRentalItems(uniqueName)
+  {
+    await this.page.waitForTimeout(3000)
+  const row = this.page.locator(`//tr[.//td[normalize-space()="${uniqueName}"]]`).first();
+  await row.scrollIntoViewIfNeeded(); // ensure the row is vertically visible
+
+// Locate the Edit button inside that row
+const editBtn = row.locator('a[title="Edit"], button[title="Edit"]').first();
+
+// --- Make sure the edit icon is visible horizontally ---
+await editBtn.evaluate((el) => {
+  // find the nearest horizontal scroller (adjust selectors if your table uses custom wrappers)
+  const scroller =
+    el.closest('.overflow-x-auto, .table-responsive, .k-grid-content, .k-virtual-scrollable-wrap, [style*="overflow-x"]');
+
+  if (scroller) {
+    const eRect = el.getBoundingClientRect();
+    const sRect = scroller.getBoundingClientRect();
+
+    // Adjust scrollLeft to bring element into horizontal view
+    if (eRect.right > sRect.right) {
+      scroller.scrollLeft += (eRect.right - sRect.right) + 40; // scroll right
+    } else if (eRect.left < sRect.left) {
+      scroller.scrollLeft -= (sRect.left - eRect.left) + 40; // scroll left
+    }
+  } else {
+    // fallback: scroll into view if no scroller container
+    el.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }
+});
+
+// Wait until Playwright considers it visible and clickable
+await editBtn.waitFor({ state: 'visible', timeout: 5000 });
+
+// ✅ Click the Edit button
+await editBtn.click();
+
+// Optional: wait for the edit form or page to appear
+await this.page.waitForLoadState('domcontentloaded');
+
+await this.page.waitForTimeout(2000)
+
+await this.ItemUnitQtyInputfield.fill()
+  }
 }

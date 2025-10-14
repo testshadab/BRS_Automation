@@ -8,7 +8,7 @@ const staging = {
     baseUrl: "https://testingbrs.com/",
     ENV: "staging"
 };
-const ENV = process.env.TEST_ENV || "staging";
+const ENV = process.env.TEST_ENV || "prod";
 const environmentConfig = {
     prod,
     staging,
