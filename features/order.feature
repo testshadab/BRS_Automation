@@ -10,18 +10,18 @@ Feature: Verify the order Functionality
     Then I should be logged in successfully
     Then I should dismiss the warming message
 
-  @orderPurchase
+  @orderPurchaseCardDetails
   Scenario Outline: Verify backend order after complete purchase
     When I navigate to the website page
-    And I enter all the required details "<firstName>" "<lastName>" "<email>" "<address>" "<city>" "<state>" "<zip>" "<phone>" "<coupon_code>"
+    And I enter all the required details "<firstName>" "<lastName>" "<email>" "<address>" "<city>" "<state>" "<zip>" "<phone>" "<coupon_code>" "<card_number>" "<exp_date>" "<cvc>" "<zip>"
     And I complete the product purchase for the customer email address "<email>" and cancel the order
 
     Examples:
-      | firstName | lastName | email                | address                                 | city     | state    | zip   | phone      | coupon_code |
-      | John      | Doe      | john.doe@yopmail.com | 1809 Silvery Ln, Dearborn, MI 48128, US | Dearborn | Michigan | 48128 | 9639688088 | welcome10   |
+      | firstName | lastName | email                | address                                 | city     | state    | zip   | phone      | coupon_code | card_number      | exp_date | cvc | zip   |
+      | John      | Doe      | john.doe@yopmail.com | 1809 Silvery Ln, Dearborn, MI 48128, US | Dearborn | Michigan | 48128 | 9639688088 | welcome10   | 4242424242424242 |     1028 | 123 | 12345 |
 
   @editCreatedOrder
-  Scenario Outline: Verify backend order after complete purchase
+  Scenario Outline: Edit the order and verify the functionality of billing, reports, and batch print 
     When I navigate to the website page
     And I enter all the required details "<firstName>" "<lastName>" "<email>" "<address>" "<city>" "<state>" "<zip>" "<phone>" "<coupon_code>"
     And I update some details in the backend for the customer email address "<email>" such as "<update_phone>" add a "<note>" and update payment mode to "<payment_type>"
@@ -34,7 +34,7 @@ Feature: Verify the order Functionality
     Then I delete the created order for the customer with email address "<email>"
 
     Examples:
-      | firstName | lastName | email                | address                                 | city     | state    | zip   | phone      | coupon_code | update_phone | note                   | payment_type | product_name      |
+      | firstName | lastName | email                | address                                  | city     | state    | zip   | phone      | coupon_code | update_phone | note                   | payment_type | product_name      |
       | John      | Doe      | john.doe@yopmail.com | 1809 Silvery Ln, Dearborn, MI 48128, USA | Dearborn | Michigan | 48128 | 9639688088 | welcome10   |   9652145247 | test the created order | Venmo        | Wet Bounce Houses |
 
   @customer
@@ -59,4 +59,4 @@ Feature: Verify the order Functionality
 
     Examples:
       | firstName | lastName | email                | address               | city      | state  | zip   | phone   | product_name             | start_time | end_time |
-      | John      | Doe      | john.doe@yopmail.com | 3355 S Las Vegas Blvd | Las Vegas | Nevada | 89109 | 9639688 | Cheverolet Corvette 1961 |            11:00 |          11:00 |
+      | John      | Doe      | john.doe@yopmail.com | 3355 S Las Vegas Blvd | Las Vegas | Nevada | 89109 | 9639688 | Cheverolet Corvette 1961 |      11:00 |    11:00 |

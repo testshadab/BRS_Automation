@@ -13,7 +13,7 @@ Feature: Verify the login and signup functionality
     Then I should be redirected back to the login page
 
   @createNewAccountForgetPassword
-  Scenario Outline: Create a new account
+  Scenario Outline: Create a new account and verify the functionality of forget password
     Given I am on the login page
     When I click on the login button
     And I click on the create new account

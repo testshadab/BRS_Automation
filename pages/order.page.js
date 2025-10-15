@@ -3,7 +3,7 @@ import config from '../configs/config.js';
 export class OrdersPage {
     constructor(page) {
         this.page = page;
-        this.initLocators(page);
+        this.initLocators(this.page);
     }
 
     initLocators(page) {
@@ -44,6 +44,14 @@ export class OrdersPage {
         this.agreeCheckOut= page.locator('[id="agreeterms"]')
         this.placeOrder= page.locator('[id="place-older"]')
         this.orderSuccessfullyPlaced= page.locator("//*[text()='Thank you for your Order']")
+
+        // Creadit card details:-
+        this.creaditCardRadioButton= page.locator("#payment_type_stripe")
+        this.iframe = page.frameLocator('[title="Secure card payment input frame"]');
+        this.cardNumberInputField= this.iframe.locator('[name="cardnumber"]')
+        this.expdateInputField= this.iframe.locator('[name="exp-date"]')
+        this.cvcInputField= this.iframe.locator('[name="cvc"]')
+        this.zipInputField= this.iframe.locator('[name="postal"]')
 
 
         // Route planner:-
@@ -216,6 +224,7 @@ export class OrdersPage {
     .locator('#start_date_dateview:visible a.k-link[data-value="' + fmt(start) + '"]')
     .click();
 
+  await this.page.waitForTimeout(2000)
   await this.endDate.click();
   await this.page.waitForTimeout(3000)
   await this.page
@@ -268,6 +277,69 @@ export class OrdersPage {
     await this.damageCheckbox.click()
     await this.agreeCheckOut.click()
 
+    await this.placeOrder.click()
+    await this.orderSuccessfullyPlaced.waitFor({ state: 'visible', timeout: 10000})
+    await this.page.waitForTimeout(2000)
+  }
+
+   async fillBillinDetailsAlongWithCardDetails(
+    firstName,
+    lastName,
+    email,
+    address,
+    city,
+    state,
+    zip,
+    phone,
+    couponcode="welcome10",
+    cardnumber,
+    expdate,
+    cvc,
+    zipnumber
+  ) {
+    await this.addCartButton.click()
+    await this.procedCheckoutButton.click();
+    await this.orderFirstName.fill(firstName);
+    await this.orderLastName.fill(lastName);
+    await this.customerEmail.fill(email);
+    await this.orderAddress.fill(''); // clear first
+    await this.orderAddress.type(address, { delay: 100 }); // type slowly to trigger suggestions
+
+    await this.page.waitForTimeout(1000);
+
+    await this.page.keyboard.press('ArrowDown');
+    await this.address.click()
+    await this.orderCity.fill(city);
+
+    await this.stateSelect.selectOption({ label: state }).catch(async () => {
+    await this.stateSelect.selectOption({ value: state });
+    });
+
+    if (zip)   await this.zipCode.fill(zip);
+    if (phone) await this.phoneNumber.fill(phone);
+
+    if (await this.firstTipRadioButton.isVisible()) await this.firstTipRadioButton.click();
+    if (await this.couponCodeField.isVisible()) await this.couponCodeField.fill(couponcode)
+    if(await this.applyButton.isVisible()) await this.applyButton.click()  
+    
+
+    await this.sameBillingAddress.click()
+    await this.page.waitForTimeout(2000)
+    await this.creaditCardRadioButton.click()
+    await this.page.waitForTimeout(3000)
+    await this.cardNumberInputField.fill(cardnumber)
+    await this.page.waitForTimeout(2000)
+    await this.expdateInputField.fill(expdate)
+    await this.page.waitForTimeout(2000)
+    await this.cvcInputField.fill(cvc)
+    await this.page.waitForTimeout(2000)
+    await this.zipInputField.fill(zipnumber)
+    await this.page.waitForTimeout(2000)
+
+    await this.damageCheckbox.click()
+    await this.agreeCheckOut.click()
+
+  
     await this.placeOrder.click()
     await this.orderSuccessfullyPlaced.waitFor({ state: 'visible', timeout: 10000})
     await this.page.waitForTimeout(2000)
@@ -673,10 +745,10 @@ await row.waitFor({ state: 'visible', timeout: 10000 });
 const row = this.page.locator(`//tr[.//td[normalize-space()="${email}"]]`).first();
 await row.scrollIntoViewIfNeeded(); // ensure the row is vertically visible
 
-// Locate the Edit button inside that row
+// Locate the uncancel button inside that row
 const uncancelBtn = row.locator('a[title="Un-Cancel"], button[title="Un-Cancel"]').first();
 
-// --- Make sure the edit icon is visible horizontally ---
+// --- Make sure the uncancel icon is visible horizontally ---
 await uncancelBtn.evaluate((el) => {
   // find the nearest horizontal scroller (adjust selectors if your table uses custom wrappers)
   const scroller =
@@ -701,10 +773,9 @@ await uncancelBtn.evaluate((el) => {
 // Wait until Playwright considers it visible and clickable
 await uncancelBtn.waitFor({ state: 'visible', timeout: 5000 });
 
-// ✅ Click the Edit button
+// ✅ Click the uncancel button
 await uncancelBtn.click();
 
-// Optional: wait for the edit form or page to appear
 await this.page.waitForLoadState('domcontentloaded');
 
 await this.uncancelSuccessMessage.waitFor({ state: 'visible', timeout: 10000 })

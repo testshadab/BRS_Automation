@@ -44,7 +44,7 @@ Then('I complete the product purchase for the customer email address {string} an
    orderPage = new OrdersPage(this.page);
    await orderPage.navigateAllOrder()
    await orderPage.editTheOrder(email)
-   await orderPage.reviewOrder()
+  //  await orderPage.reviewOrder()
    await orderPage.proceedPayment()
    await orderPage.editTheOrder(email)
    await orderPage.cancelCreatedOrder()
@@ -238,6 +238,14 @@ Then('I navigate to the customer page and delete the newly created customer', as
   await orderPage.clickOnCustomerLink()
   await orderPage.deleteTheCustomer(newEmail)
 
+})
+
+When('I enter all the required details {string} {string} {string} {string} {string} {string} {string} {string} {string} {string} {string} {string} {string}', async function (firstName, lastName, email, address, city, state, zip, phone, coupon, cardnumber, expdate, cvc, zipnumber) {
+  // Write code here that turns the phrase above into concrete actions
+  orderPage = new OrdersPage(this.page);
+  await orderPage.selectTheProduct()
+  await orderPage.selectDate();
+  await orderPage.fillBillinDetailsAlongWithCardDetails(firstName, lastName, email, address, city, state, zip, phone, coupon, cardnumber, expdate, cvc, zipnumber)
 })
 
 

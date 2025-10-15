@@ -202,7 +202,8 @@ async navigateGetnadaApplication(username) {
     return inboxPage; // Return for further actions like checking mail
 
   } catch (error) {
-    console.error("Error in navigateGetnadaApplication():", error.message);
+    console.error("Fatal error in navigateGetnadaApplication():", error.message);
+    throw error;
   }
 }
 
@@ -264,7 +265,8 @@ async verifyEmailAndLogin(username, password) {
     console.log("↩️ Returned to original main page successfully.");
 
   } catch (error) {
-    console.error("Error in verifyEmailAndLogin():", error.message);
+    console.error("Fatal Error in verifyEmailAndLogin():", error.message);
+    throw error;
   }
 }
 
@@ -342,7 +344,8 @@ async navigateGetnadaApplicationToResetPassword(username) {
     return inboxPage; // Return for further actions like checking mail
 
   } catch (error) {
-    console.error("Error in navigateGetnadaApplication():", error.message);
+    console.error("Fatal error in navigateGetnadaApplication():", error.message);
+    throw error;
   }
 }
 
@@ -393,9 +396,9 @@ async createNewPassword(newpassword, confirmnewpassword) {
     console.log("password successfully updated");
 
   } catch (error) {
-    console.error("Error in createNewPassword():", error.message);
+    console.error("Fatal Error in createNewPassword():", error.message);
+    throw error;
   }
 }
-
 
 }
