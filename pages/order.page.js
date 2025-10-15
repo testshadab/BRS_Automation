@@ -347,13 +347,16 @@ export class OrdersPage {
 
   async navigateAllOrder()
   {
+    await this.ordersLink.waitFor({ state: 'visible', timeout: 10000})
     await this.ordersLink.click()
+    await this.allOrders.first().waitFor({ state: 'visible', timeout: 10000})
     await this.allOrders.first().click()
     await this.page.waitForTimeout(3000)
   }
 
   async editTheOrder(email)
   {
+    await this.page.waitForTimeout(3000)
     // Locate the row that contains the email
 const row = this.page.locator(`//tr[.//td[normalize-space()="${email}"]]`).first();
 await row.scrollIntoViewIfNeeded(); // ensure the row is vertically visible
