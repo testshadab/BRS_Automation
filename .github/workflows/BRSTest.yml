@@ -53,7 +53,7 @@ jobs:
         if: ${{ github.event.inputs.tags == '' || github.event_name != 'workflow_dispatch' }}
         shell: pwsh
         run: |
-          npx cucumber-js --parallel 2 --format html:reports/cucumber-report.html --format json:reports/cucumber-report.json
+          npx cucumber-js --format html:reports/cucumber-report.html --format json:reports/cucumber-report.json
           $exitCode = $LASTEXITCODE
           npm run report
           exit $exitCode
@@ -65,7 +65,7 @@ jobs:
         if: ${{ github.event.inputs.tags != '' && github.event_name == 'workflow_dispatch' }}
         shell: pwsh
         run: |
-          npx cucumber-js --tags "@${{ github.event.inputs.tags }}" --parallel 4 --format html:reports/cucumber-report.html --format json:reports/cucumber-report.json
+          npx cucumber-js --tags "@${{ github.event.inputs.tags }}" --format html:reports/cucumber-report.html --format json:reports/cucumber-report.json
           $exitCode = $LASTEXITCODE
           npm run report
           exit $exitCode
