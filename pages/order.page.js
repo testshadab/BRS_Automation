@@ -3,7 +3,7 @@ import config from '../configs/config.js';
 export class OrdersPage {
     constructor(page) {
         this.page = page;
-        this.initLocators(this.page);
+        this.initLocators(page);
     }
 
     initLocators(page) {
