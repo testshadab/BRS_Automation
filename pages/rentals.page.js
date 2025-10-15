@@ -129,6 +129,7 @@ export class RentalsPage {
 
     async verifyCateogryCreatwedOnWebsiteHomePage(categoryName)
     {
+      await this.page.locator(`text=${categoryName}`).first().waitFor({ state: 'visible', timeout: 20000 })
         // Verify that the expected text appears on the page
         const isVisible = await this.page.locator(`text=${categoryName}`).first().isVisible();
 
