@@ -1,0 +1,96 @@
+name: BRS Test Suite
+
+on:
+  workflow_dispatch:
+    inputs:
+      Environment:
+        description: "Which environment will be executed"
+        required: true
+        type: choice
+        default: prod
+        options: ["preprod", "staging", "stagingLatest", "prod"]
+      tags:
+        description: "Test tag to run (without @), leave empty to run all tests"
+        required: false
+        type: string
+
+jobs:
+  test:
+    runs-on: windows-latest
+    env:
+      TEST_ENV: ${{ github.event.inputs.Environment || 'prod' }}
+      EXECUTION_MODE: "local"
+      NODE_ENV: "ci"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          if (-not (Test-Path -Path "package-lock.json")) {
+            npm install
+          } else {
+            npm ci
+          }
+          npx playwright install --with-deps
+
+      - name: Setup test directories
+        shell: pwsh
+        run: |
+          Write-Host "Setting up test directories..."
+          $dirs = @("reports","test-reports","downloadfile","jsonReport","llm-judge/results","urlData")
+          foreach ($d in $dirs) {
+            if (-not (Test-Path -Path $d)) { New-Item -ItemType Directory -Path $d -Force }
+          }
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          $tags = "${{ github.event.inputs.tags }}"
+          if ([string]::IsNullOrEmpty($tags)) {
+            Write-Host "Running all tests..."
+            npx cucumber-js --format html:reports/cucumber-report.html --format json:reports/cucumber-report.json
+          } else {
+            Write-Host "Running tests with tag: @$tags"
+            npx cucumber-js --tags "@$tags" --format html:reports/cucumber-report.html --format json:reports/cucumber-report.json
+          }
+
+      - name: Merge and Generate Final Report
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host "📦 Generating HTML report..."
+          node multipleCucumberReports.js
+
+      - name: Generate Test Summary Report
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path -Path "reports/cucumber-report.json") {
+            Write-Host "📊 Generating test summary..."
+            node helpers/summarizeResults.js reports/cucumber-report.json
+            Write-Host "✅ Summary generated successfully"
+          } else {
+            Write-Host "⚠️ cucumber-report.json not found. Skipping summary generation."
+          }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_id }}-${{ env.TEST_ENV }}
+          path: |
+            reports/**
+            test-reports/**
+            cucumber-report.html
+            cucumber-report.json
+            urlData/**
+          retention-days: 30
+          if-no-files-found: warn
