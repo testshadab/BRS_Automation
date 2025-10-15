@@ -24,7 +24,7 @@ Feature: Test the functionality of Rental Categories
     When I navigate to Rental Items
     And I add a new Product with required details "<optionText>", "<Dimentions>", "<Qty>", "<Outlet>", "<ShortDescription>", "<LongtDescription>", "<Producttype>", "<Billingtype>"
     And I navigate to the website and confirm that the newly created item appears on the home page
-    And Edit the newly created item and verify that the changes are saved successfully
+    And Edit the newly created item update the quatity "<update_Qty>" and verify that the changes are saved successfully
     Then Delete the newly created item and confirm that it no longer appears on the home page
 
     Examples:

@@ -67,6 +67,9 @@ export class RentalsPage {
         this.ItemCreationSuccessMessage = page.locator("//*[contains(text(),'Product was successfully created')]");
         this.productLink = page.locator("//a[text()='Products']");
         this.wetBounceHouseCategories = page.locator('[alt="Wet Bounce Houses"]');
+        this.updateProductButton= page.locator('[value="Update Product"]')
+        this.ItemUpdateSuccessMessage= page.locator("//*[contains(text(),'Product was successfully updated')]")
+        this.itemDeleteSuccessMessage= page.locator("//*[contains(text(),'Product was successfully deleted')]")
        
 
     }
@@ -430,17 +433,19 @@ async deleteNewlyCreatedPromo(promoname)
       await this.wetBounceHouseCategories.click()
       await this.page.waitForTimeout(5000)
           // Verify that the category no longer appears on the home page
-const isVisible = await this.page.locator(`text=${uniqueName}`).first().isVisible();
 
-if (!isVisible) {
-  console.log(`"${uniqueName}" is no longer visible on the product page`);
-} else {
-  console.log(`"${uniqueName}" is still present on the product page`);
-}
+      await this.page.locator(`text=${uniqueName}`).first().waitFor({ state: 'visible', timeout: 20000})
+      const isVisible = await this.page.locator(`text=${uniqueName}`).first().isVisible();
+
+      if (isVisible) {
+        console.log(`"${uniqueName}" is visible on the product page`);
+      } else {
+        console.log(`"${uniqueName}" is no longer present on the product page`);
+      }
 
   }
 
-  async editTheNewlyCreatedRentalItems(uniqueName)
+  async editTheNewlyCreatedRentalItems(uniqueName, updateQty)
   {
     await this.page.waitForTimeout(3000)
   const row = this.page.locator(`//tr[.//td[normalize-space()="${uniqueName}"]]`).first();
@@ -482,6 +487,74 @@ await this.page.waitForLoadState('domcontentloaded');
 
 await this.page.waitForTimeout(2000)
 
-await this.ItemUnitQtyInputfield.fill()
+await this.ItemUnitQtyInputfield.fill(updateQty)
+
+await this.updateProductButton.click()
+
+await this.ItemUpdateSuccessMessage.waitFor({ state: 'visible', timeout: 10000})
+}
+ 
+async deleteNewlyCreatedItem(uniqueName)
+{
+  await this.RentalItemsButton.click()
+  await this.page.waitForTimeout(3000)
+   // Row that contains the rental item
+  const row = this.page.locator(`//tr[.//td[normalize-space()="${uniqueName}"]]`).first();
+  await row.scrollIntoViewIfNeeded(); // vertical into view
+
+  // Delete button inside that row
+  const deleteBtn = row.locator('a[title="Delete"], button[title="Delete"]').first();
+
+  // --- Make sure the delete icon is visible horizontally ---
+  await deleteBtn.evaluate((el) => {
+    // find the nearest horizontal scroller (adjust selectors if your app differs)
+    const scroller =
+      el.closest('.overflow-x-auto, .table-responsive, .k-grid-content, .k-virtual-scrollable-wrap, [style*="overflow-x"]');
+
+    if (scroller) {
+      const eRect = el.getBoundingClientRect();
+      const sRect = scroller.getBoundingClientRect();
+
+      // If the element is clipped on the right or left, adjust scrollLeft
+      if (eRect.right > sRect.right) {
+        scroller.scrollLeft += (eRect.right - sRect.right) + 40; // small padding
+      } else if (eRect.left < sRect.left) {
+        scroller.scrollLeft -= (sRect.left - eRect.left) + 40;
+      }
+    } else {
+      // fallback: center in viewport
+      el.scrollIntoView({ block: 'nearest', inline: 'center' });
+    }
+  });
+
+  // Wait until Playwright considers it actually visible & actionable
+  await deleteBtn.waitFor({ state: 'visible', timeout: 5000 });
+
+  // --- Click and accept the confirm dialog ---
+  await Promise.all([
+    this.page.waitForEvent('dialog').then(d => d.accept()), // set BEFORE clicking
+    deleteBtn.click()
+  ]);
+  // await this.page.waitForTimeout(5000)
+  await this.itemDeleteSuccessMessage.waitFor({ state: 'visible', timeout: 10000 })
+}
+
+   async verifyProductRemoveOnWebsiteProductPage(uniqueName)
+    {
+      await this.productLink.click();
+      await this.page.waitForTimeout(2000)
+      await this.wetBounceHouseCategories.click()
+      await this.page.waitForTimeout(5000)
+          // Verify that the category no longer appears on the home page
+
+      
+      const isVisible = await this.page.locator(`text=${uniqueName}`).first().isVisible();
+
+      if (!isVisible) {
+        console.log(`"${uniqueName}" is no longer visible on the product page`);
+      } else {
+        console.log(`"${uniqueName}" is still present on the product page`);
+      }
+
   }
 }

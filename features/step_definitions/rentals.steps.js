@@ -80,14 +80,14 @@ When('I create a new promo code with following deatils {string} {string} {string
 })
 
 When('I update the newly created promo code {string} {string}', async function (promotitle, description) {
-  // Write code here that turns the phrase above into concrete actions
+ 
 
   rentalPage=new RentalsPage(this.page)
   await rentalPage.editTheNewlyCreatedPromo(promotitle, description)
 })
 
 Then('I delete the newly created promo code {string}',async function (promotitle) {
-  // Write code here that turns the phrase above into concrete actions
+ 
 
    rentalPage=new RentalsPage(this.page)
    await rentalPage.deleteNewlyCreatedPromo(promotitle)
@@ -101,13 +101,13 @@ await rentalPage.navigateToRentalPage()
 });
 
 When('I add a new Product with required details {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}', async function (optionText, Dimentions, Qty, Outlet, ShortDescription, LongtDescription, Producttype, Billingtype) {
-  // Write code here that turns the phrase above into concrete actions
+  
   rentalPage=new RentalsPage(this.page)
   uniqueName=await rentalPage.createNewItem(optionText, Dimentions, Qty, Outlet, ShortDescription, LongtDescription, Producttype, Billingtype)
   })
 
 When('I navigate to the website and confirm that the newly created item appears on the home page',async function () {
-  // Write code here that turns the phrase above into concrete actions
+  
 
   orderPage = new OrdersPage(this.page);
   mainPage = this.page; 
@@ -117,21 +117,32 @@ When('I navigate to the website and confirm that the newly created item appears 
   await rentalPage.verifyProductAddedOnWebsiteProductPage(uniqueName)
 })
 
-When('Edit the newly created item and verify that the changes are saved successfully', async function () {
-  // Write code here that turns the phrase above into concrete actions
-
+When('Edit the newly created item update the quatity {string} and verify that the changes are saved successfully', async function (updateQty) {
+  
   await this.page.close();
   this.page = mainPage;
   await this.page.bringToFront();
   console.log('Returned to main website page');
   await this.page.waitForTimeout(3000)
   rentalPage=new RentalsPage(this.page)
+  await rentalPage.editTheNewlyCreatedRentalItems(uniqueName, updateQty)
 
 })
 
 Then('Delete the newly created item and confirm that it no longer appears on the home page', async function () {
-  // Write code here that turns the phrase above into concrete actions
+  
+  rentalPage=new RentalsPage(this.page)
+  await rentalPage.deleteNewlyCreatedItem(uniqueName)
+  orderPage = new OrdersPage(this.page);
+  mainPage = this.page; 
+  this.page = await orderPage.clickOnTheWebsiteLink();
+  await orderPage.dismissPopup()
+  rentalPage=new RentalsPage(this.page)
+  await rentalPage.verifyProductRemoveOnWebsiteProductPage(uniqueName)
 })
+
+
+
 
 
 
