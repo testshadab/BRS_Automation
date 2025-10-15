@@ -88,12 +88,15 @@ export class RentalsPage {
 
     // ===== NAVIGATION =====
     async clickOnRentalsDropdown() {
+      await this.RentalsDropdown.waitFor({ state: 'visible', timeout: 20000 })
         await this.RentalsDropdown.click();
+        await this.RentalCategoriesButton.waitFor({ state: 'visible', timeout: 20000 })
         await this.RentalCategoriesButton.click();
     }
 
     // ===== CREATE =====
     async fillAddProductCatagoryDetails() {
+      await this.AddProductCatagoryButton.waitFor({ state: 'visible', timeout: 20000 })
         await this.AddProductCatagoryButton.click();
 
         // --- OLD (hard-coded) ---
@@ -101,6 +104,7 @@ export class RentalsPage {
 
         // --- NEW (unique per run) ---
         const uniqueName = this.generateUniqueCategoryName();
+        await this.EnterCatagoryName.waitFor({ state: 'visible', timeout: 20000 })
         await this.EnterCatagoryName.fill(uniqueName);
 
         await this.DisplayDropdown.click();

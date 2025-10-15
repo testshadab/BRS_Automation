@@ -17,11 +17,13 @@ await rentalPage.clickOnRentalsDropdown()
 });
 
 Then('I add a new Product Category with required details', async function () {
+  rentalPage=new RentalsPage(this.page)
    newCategoriesName=await rentalPage.fillAddProductCatagoryDetails()
 
 });
 
 Then('the category should be created successfully', async function () {
+  rentalPage=new RentalsPage(this.page)
   await rentalPage.catagorySuccessfullyCreated()
 });
 

@@ -280,6 +280,36 @@ export class OrdersPage {
     await this.placeOrder.click()
     await this.orderSuccessfullyPlaced.waitFor({ state: 'visible', timeout: 10000})
     await this.page.waitForTimeout(2000)
+
+      // --- SAFE TAB CLOSE LOGIC ---
+  try {
+    const context = this.page.context();
+    const currentURL = this.page.url();
+    await this.page.waitForTimeout(1000);
+
+    // Close current tab
+    await this.page.close({ runBeforeUnload: true });
+
+    // Find main page (usually the BRS tab)
+    const mainTab = context
+      .pages()
+      .find(
+        (p) =>
+          p.url().includes("bouncerentalsolutions.com") ||
+          p.url().includes("contractors")
+      );
+
+    if (!mainTab)
+      throw new Error("❌ Main BRS page not found after checkout tab closed.");
+
+    console.log("🔁 Switched back to main BRS page.");
+this.page = mainTab;              // ✅ rebind OrdersPage to active page
+this.initLocators(mainTab);       // ✅ refresh all locators
+return mainTab;
+  } catch (err) {
+    console.error("⚠️ Error closing checkout tab:", err);
+    throw err;
+  }
   }
 
    async fillBillinDetailsAlongWithCardDetails(
@@ -343,6 +373,36 @@ export class OrdersPage {
     await this.placeOrder.click()
     await this.orderSuccessfullyPlaced.waitFor({ state: 'visible', timeout: 10000})
     await this.page.waitForTimeout(2000)
+
+      // --- SAFE TAB CLOSE LOGIC ---
+  try {
+    const context = this.page.context();
+    const currentURL = this.page.url();
+    await this.page.waitForTimeout(1000);
+
+    // Close current tab
+    await this.page.close({ runBeforeUnload: true });
+
+    // Find main page (usually the BRS tab)
+    const mainTab = context
+      .pages()
+      .find(
+        (p) =>
+          p.url().includes("bouncerentalsolutions.com") ||
+          p.url().includes("contractors")
+      );
+
+    if (!mainTab)
+      throw new Error("❌ Main BRS page not found after checkout tab closed.");
+
+    console.log("🔁 Switched back to main BRS page.");
+this.page = mainTab;              // ✅ rebind OrdersPage to active page
+this.initLocators(mainTab);       // ✅ refresh all locators
+return mainTab;
+  } catch (err) {
+    console.error("⚠️ Error closing checkout tab:", err);
+    throw err;
+  }
   }
 
   async navigateAllOrder()
