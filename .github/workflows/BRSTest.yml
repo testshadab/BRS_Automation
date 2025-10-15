@@ -26,7 +26,7 @@ jobs:
     env:
       # fallback for TEST_ENV if not set from manual dispatch
       TEST_ENV: ${{ github.event.inputs.Environment || 'prod' }}
-      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      # SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
       SLACK_CHANNEL_ID: "CGJFM3XCM"
       FAILURE_SLACK_CHANNEL_ID: "CGJFM3XCM"
     steps:
@@ -49,7 +49,7 @@ jobs:
           }
           Write-Host "✅ Slack token is configured"
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          # SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           GITHUB_ACTIONS: "true"
 
       - name: Send initial Slack notification
@@ -78,7 +78,7 @@ jobs:
           Write-Host "Extracted thread_ts: $threadTs"
           echo "thread_ts=$threadTs" >> $env:GITHUB_OUTPUT
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          # SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           SLACK_CHANNEL_ID: "CGJFM3XCM"
           GITHUB_ACTIONS: "true"
 
@@ -210,7 +210,7 @@ jobs:
           Write-Host "Using thread_ts: $threadTs"
           node helpers/postBuildStatus.js "success" "$threadTs"
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          # SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           SLACK_CHANNEL_ID: "CGJFM3XCM"
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -238,7 +238,7 @@ jobs:
           Write-Host "Using thread_ts: $threadTs"
           node helpers/postBuildStatus.js "failure" "$threadTs"
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          # SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           SLACK_CHANNEL_ID: "CGJFM3XCM"
           FAILURE_SLACK_CHANNEL_ID: "CGJFM3XCM"
           GITHUB_SERVER_URL: ${{ github.server_url }}
