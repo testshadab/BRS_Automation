@@ -1,4 +1,4 @@
-@AuthProcess
+@AuthProcess @regression
 Feature: Verify the login and signup functionality
 
   @valid_login

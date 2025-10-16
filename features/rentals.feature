@@ -1,4 +1,4 @@
-@rentals
+@rentals @regression
 Feature: Test the functionality of Rental Categories
 
   Background:

@@ -1,4 +1,4 @@
-@orders
+@orders @regression
 Feature: Verify the order Functionality
 
   Background:

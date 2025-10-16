@@ -1,4 +1,4 @@
-@emailContactSection
+@emailContactSection @regression
 Feature: Manage email contact section
 
   Background:
