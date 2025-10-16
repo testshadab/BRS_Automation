@@ -6,7 +6,7 @@ Feature: Verify the login and signup functionality
     Given I am on the login page
     When I click on the login button
     When I enter valid username "saadsaadcs@gmail.com"
-    And I enter valid password "Admin999"
+    And I enter valid password "Admin999@"
     And I click the login button
     Then I should be logged in successfully
     And I log out from the application
